@@ -89,7 +89,7 @@ class AcousticBrainzSubmitPlugin(plugins.BeetsPlugin):
         cmd.parser.add_option(
             u'-f', u'--force', dest='force_refetch',
             action='store_true', default=False,
-            help=u'always analyse acousticbrainz data',
+            help=u're-analyse data when already present'
         )
 
         cmd.func = self.command
@@ -107,8 +107,8 @@ class AcousticBrainzSubmitPlugin(plugins.BeetsPlugin):
 
         if not force:
             mood_str = item.get('mood_acoustic', u'')
-            if len(mood_str) != 0:
-                self._log.info(u'Already set acousticbrainz tag for {} ', item)
+            if mood_str:
+                self._log.info(u'Already acousticbrainz tags available for {} ', item)
                 return None
                 
         mbid = item['mb_trackid']
