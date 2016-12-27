@@ -39,8 +39,7 @@ class AcousticBrainzSubmitPlugin(plugins.BeetsPlugin):
     def __init__(self):
         super(AcousticBrainzSubmitPlugin, self).__init__()
 
-        self.config.add({'extractor': u''})
-
+        self.config.add({'extractor': u'','force': False})
         self.extractor = self.config['extractor'].as_str()
         if self.extractor:
             self.extractor = util.normpath(self.extractor)
@@ -86,6 +85,13 @@ class AcousticBrainzSubmitPlugin(plugins.BeetsPlugin):
             'absubmit',
             help=u'calculate and submit AcousticBrainz analysis'
         )
+
+        cmd.parser.add_option(
+            u'-f', u'--force', dest='force_refetch',
+            action='store_true', default=False,
+            help=u'always analyse acousticbrainz data',
+        )
+
         cmd.func = self.command
         return [cmd]
 
@@ -93,11 +99,18 @@ class AcousticBrainzSubmitPlugin(plugins.BeetsPlugin):
         # Get items from arguments
         items = lib.items(ui.decargs(args))
         for item in items:
-            analysis = self._get_analysis(item)
+            analysis = self._get_analysis(item,opts.force_refetch or self.config['force'])
             if analysis:
                 self._submit_data(item, analysis)
 
-    def _get_analysis(self, item):
+    def _get_analysis(self, item,force):
+
+        if not force:
+            mood_str = item.get('mood_acoustic', u'')
+            if len(mood_str) != 0:
+                self._log.info(u'Already set acousticbrainz tag for {} ', item)
+                return None
+                
         mbid = item['mb_trackid']
         # If file has no mbid skip it.
         if not mbid:
