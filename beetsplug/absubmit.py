@@ -99,8 +99,10 @@ class AcousticBrainzSubmitPlugin(plugins.BeetsPlugin):
         # Get items from arguments
         items = lib.items(ui.decargs(args))
         for item in items:
+            self._log.info(u'Calculate data for {} ', item)
             analysis = self._get_analysis(item,opts.force_refetch or self.config['force'])
             if analysis:
+                self._log.info(u'Submit data to acousticbrainz ')
                 self._submit_data(item, analysis)
 
     def _get_analysis(self, item,force):
@@ -128,29 +130,33 @@ class AcousticBrainzSubmitPlugin(plugins.BeetsPlugin):
         # the data into a python object and then remove the file from the
         # system.
         tmp_file, filename = tempfile.mkstemp(suffix='.json')
+        # Close the file, so the extractor can overwrite it.
         try:
-            # Close the file, so the extractor can overwrite it.
-            try:
-                call([self.extractor, util.syspath(item.path), filename])
-            except ABSubmitError as e:
-                self._log.error(
-                    u'Failed to analyse {item} for AcousticBrainz: {error}',
-                    item=item, error=e
-                )
-                return None
-            with open(filename) as tmp_file:
-                analysis = json.loads(tmp_file.read())
-            # Add the hash to the output.
-            analysis['metadata']['version']['essentia_build_sha'] = \
-                self.extractor_sha
-            return analysis
-        finally:
-            try:
-                os.remove(filename)
-            except OSError as e:
-                # errno 2 means file does not exist, just ignore this error.
-                if e.errno != 2:
-                    raise
+            call([self.extractor, util.syspath(item.path), filename])
+        except ABSubmitError as e:
+            self._log.error(
+                u'Failed to analyse {item} for AcousticBrainz: {error}',
+                item=item, error=e
+            )
+            return None
+            
+        try:
+            file = open(filename, 'r')
+           
+            analysis = json.loads(file.read())
+            file.close()
+            os.close(tmp_file)
+            os.remove(filename)
+        except OSError as e: 
+            # errno 2 means file does not exist, just ignore this error. 
+            if e.errno != 2: 
+                raise 
+
+        # Add the hash to the output.
+        analysis['metadata']['version']['essentia_build_sha'] = \
+            self.extractor_sha
+
+        return analysis
 
     def _submit_data(self, item, data):
         mbid = item['mb_trackid']
