@@ -79,10 +79,13 @@ class AlbumInfo(object):
                  albumtype=None, va=False, year=None, month=None, day=None,
                  label=None, mediums=None, artist_sort=None,
                  releasegroup_id=None, catalognum=None, script=None,
-                 language=None, country=None, style=None, albumstatus=None,
-                 media=None, albumdisambig=None, releasegroupdisambig=None,
-                 artist_credit=None, original_year=None, original_month=None,
-                 original_day=None, data_source=None, data_url=None):
+                 language=None, country=None, style=None, genre=None,
+                 albumstatus=None, media=None, albumdisambig=None,
+                 releasegroupdisambig=None, artist_credit=None,
+                 original_year=None, original_month=None,
+                 original_day=None, data_source=None, data_url=None,
+                 discogs_albumid=None, discogs_labelid=None,
+                 discogs_artistid=None):
         self.album = album
         self.album_id = album_id
         self.artist = artist
@@ -103,6 +106,7 @@ class AlbumInfo(object):
         self.language = language
         self.country = country
         self.style = style
+        self.genre = genre
         self.albumstatus = albumstatus
         self.media = media
         self.albumdisambig = albumdisambig
@@ -113,6 +117,9 @@ class AlbumInfo(object):
         self.original_day = original_day
         self.data_source = data_source
         self.data_url = data_url
+        self.discogs_albumid = discogs_albumid
+        self.discogs_labelid = discogs_labelid
+        self.discogs_artistid = discogs_artistid
 
     # Work around a bug in python-musicbrainz-ngs that causes some
     # strings to be bytes rather than Unicode.
@@ -123,8 +130,10 @@ class AlbumInfo(object):
         """
         for fld in ['album', 'artist', 'albumtype', 'label', 'artist_sort',
                     'catalognum', 'script', 'language', 'country', 'style',
-                    'albumstatus', 'albumdisambig', 'releasegroupdisambig',
-                    'artist_credit', 'media']:
+                    'genre', 'albumstatus', 'albumdisambig',
+                    'releasegroupdisambig', 'artist_credit',
+                    'media', 'discogs_albumid', 'discogs_labelid',
+                    'discogs_artistid']:
             value = getattr(self, fld)
             if isinstance(value, bytes):
                 setattr(self, fld, value.decode(codec, 'ignore'))
@@ -174,7 +183,8 @@ class TrackInfo(object):
                  disctitle=None, artist_credit=None, data_source=None,
                  data_url=None, media=None, lyricist=None, composer=None,
                  composer_sort=None, arranger=None, track_alt=None,
-                 work=None, mb_workid=None, work_disambig=None):
+                 work=None, mb_workid=None, work_disambig=None, bpm=None,
+                 initial_key=None, genre=None):
         self.title = title
         self.track_id = track_id
         self.release_track_id = release_track_id
@@ -199,6 +209,9 @@ class TrackInfo(object):
         self.work = work
         self.mb_workid = mb_workid
         self.work_disambig = work_disambig
+        self.bpm = bpm
+        self.initial_key = initial_key
+        self.genre = genre
 
     # As above, work around a bug in python-musicbrainz-ngs.
     def decode(self, codec='utf-8'):

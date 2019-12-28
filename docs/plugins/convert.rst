@@ -24,7 +24,9 @@ To convert a part of your collection, run ``beet convert QUERY``. The
 command will transcode all the files matching the query to the
 destination directory given by the ``-d`` (``--dest``) option or the
 ``dest`` configuration. The path layout mirrors that of your library,
-but it may be customized through the ``paths`` configuration.
+but it may be customized through the ``paths`` configuration. Files
+that have been previously converted---and thus already exist in the
+destination directory---will be skipped.
 
 The plugin uses a command-line program to transcode the audio. With the
 ``-f`` (``--format``) option you can choose the transcoding command
@@ -45,6 +47,12 @@ the destination directory and keep converted files in your library, use the
 To test your configuration without taking any actions, use the ``--pretend``
 flag. The plugin will print out the commands it will run instead of executing
 them.
+
+By default, files that do not need to be transcoded will be copied to their
+destination. Passing the ``-l`` (``--link``) flag creates symbolic links
+instead, passing ``-H`` (``--hardlink``) creates hard links.
+Note that album art embedding is disabled for files that are linked.
+Refer to the ``link`` and ``hardlink`` options below.
 
 
 Configuration
@@ -91,6 +99,18 @@ file. The available options are:
 - **threads**: The number of threads to use for parallel encoding.
   By default, the plugin will detect the number of processors available and use
   them all.
+- **link**: By default, files that do not need to be transcoded will be copied
+  to their destination. This option creates symbolic links instead. Note that
+  options such as ``embed`` that modify the output files after the transcoding
+  step will cause the original files to be modified as well if ``link`` is
+  enabled. For this reason, album-art embedding is disabled
+  for files that are linked.
+  Default: ``false``.
+- **hardlink**: This options works similar to ``link``, but it creates
+  hard links instead of symlinks.
+  This option overrides ``link``. Only works when converting to a directory
+  on the same filesystem as the library.
+  Default: ``false``.
 
 You can also configure the format to use for transcoding (see the next
 section):

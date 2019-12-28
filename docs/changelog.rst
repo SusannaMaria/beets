@@ -6,11 +6,28 @@ Changelog
 
 New features:
 
+* :doc:`plugins/fetchart`: Added a new ``high_resolution`` config option to
+  allow downloading of higher resolution iTunes artwork (at the expense of
+  file size).
+  :bug: `3391`
+* :doc:`plugins/discogs` now adds two extra fields: `discogs_labelid` and
+  `discogs_artistid`
+  :bug: `3413`
+* :doc:`/plugins/export`: Added new ``-f`` (``--format``) flag; 
+  which allows for the ability to export in json, csv and xml.
+  Thanks to :user:`austinmm`.
+  :bug:`3402`
+* :doc:`/plugins/unimported`: lets you find untracked files in your library directory.
 * We now fetch information about `works`_ from MusicBrainz.
   MusicBrainz matches provide the fields ``work`` (the title), ``mb_workid``
   (the MBID), and ``work_disambig`` (the disambiguation string).
   Thanks to :user:`dosoe`.
   :bug:`2580` :bug:`3272`
+* :doc:`/plugins/convert`: Added new ``-l`` (``--link``) flag and ``link``
+  option as well as the ``-H`` (``--hardlink``) flag and ``hardlink``
+  option which symlinks or hardlinks files that do not need to
+  be converted instead of copying them.
+  :bug:`2324`
 * :doc:`/plugins/bpd`: BPD now supports most of the features of version 0.16
   of the MPD protocol. This is enough to get it talking to more complicated
   clients like ncmpcpp, but there are still some incompatibilities, largely due
@@ -22,6 +39,16 @@ New features:
   level.
   Thanks to :user:`samuelnilsson`
   :bug:`293`
+* :doc:`/plugins/replaygain`: The new ``ffmpeg`` ReplayGain backend supports
+  ``R128_`` tags, just like the ``bs1770gain`` backend.
+  :bug:`3056`
+* :doc:`plugins/replaygain`: ``r128_targetlevel`` is a new configuration option
+  for the ReplayGain plugin: It defines the reference volume for files using
+  ``R128_`` tags. ``targetlevel`` only configures the reference volume for
+  ``REPLAYGAIN_`` files.
+  This also deprecates the ``bs1770gain`` ReplayGain backend's ``method``
+  option. Use ``targetlevel`` and ``r128_targetlevel`` instead.
+  :bug:`3065`
 * A new :doc:`/plugins/parentwork` gets information about the original work,
   which is useful for classical music.
   Thanks to :user:`dosoe`.
@@ -29,6 +56,55 @@ New features:
 * :doc:`/plugins/discogs`: The field now collects the "style" field.
   Thanks to :user:`thedevilisinthedetails`.
   :bug:`2579` :bug:`3251`
+* :doc:`/plugins/absubmit`: By default, the plugin now avoids re-analyzing
+  files that already have AB data.
+  There are new ``force`` and ``pretend`` options to help control this new
+  behavior.
+  Thanks to :user:`SusannaMaria`.
+  :bug:`3318`
+* :doc:`/plugins/discogs`: The plugin now also gets genre information and a
+  new ``discogs_albumid`` field from the Discogs API.
+  Thanks to :user:`thedevilisinthedetails`.
+  :bug:`465` :bug:`3322`
+* :doc:`/plugins/acousticbrainz`: The plugin now fetches two more additional
+  fields: ``moods_mirex`` and ``timbre``.
+  Thanks to :user:`malcops`.
+  :bug:`2860`
+* :doc:`/plugins/playlist` and :doc:`/plugins/smartplaylist`: A new
+  ``forward_slash`` config option facilitates compatibility with MPD on
+  Windows.
+  Thanks to :user:`MartyLake`.
+  :bug:`3331` :bug:`3334`
+* The 'data_source' field is now also applied as an album-level flexible
+  attribute during imports, allowing for more refined album level searches.
+  :bug:`3350` :bug:`1693`
+* :doc:`/plugins/deezer`: Added Deezer plugin as an import metadata provider:
+  you can now match tracks and albums using the `Deezer`_ database.
+  Thanks to :user:`rhlahuja`.
+  :bug:`3355`
+* :doc:`/plugins/beatport`: The plugin now gets the musical key, BPM and the
+  genre for each track.
+  :bug:`2080`
+* :doc:`/plugins/beatport`: Fix default assignment of the musical key.
+  :bug:`3377`
+* :doc:`/plugins/bpsync`: Add `bpsync` plugin to sync metadata changes
+  from the Beatport database.
+* :doc:`/plugins/beatport`: Fix assignment of `genre` and rename `musical_key`
+  to `initial_key`.
+  :bug:`3387`
+* :doc:`/plugins/hook` now treats non-zero exit codes as errors.
+  :bug:`3409`
+* :doc:`/plugins/subsonicupdate`: A new ``url`` configuration replaces the
+  older (and now deprecated) separate ``host``, ``port``, and ``contextpath``
+  config options. As a consequence, the plugin can now talk to Subsonic over
+  HTTPS.
+  Thanks to :user:`jef`.
+  :bug:`3449`
+* :doc:`/plugins/discogs`: The new ``index_tracks`` option enables
+  incorporation of work names and intra-work divisions into imported track
+  titles.
+  Thanks to :user:`cole-miller`.
+  :bug:`3459`
 
 Fixes:
 
@@ -50,6 +126,29 @@ Fixes:
   :bug:`3301`
 * :doc:`plugins/replaygain`: Fix the storage format in R128 gain tags.
   :bug:`3311` :bug:`3314`
+* :doc:`/plugins/discogs`: Fixed a crash that occurred when the Master URI
+  isn't set.
+  :bug:`2965` :bug:`3239`
+* :doc:`/plugins/spotify`: Fix handling of year-only release dates
+  returned by Spotify Albums API.
+  Thanks to :user:`rhlahuja`.
+  :bug:`3343`
+* Fixed a bug that caused the UI to display incorrect track numbers for tracks
+  with index 0 when the ``per_disc_numbering`` option was set.
+  :bug:`3346`
+* ``none_rec_action`` does not import automatically when ``timid`` is enabled.
+  Thanks to :user:`RollingStar`.
+  :bug:`3242`
+* Fix a bug that caused a crash when tagging items with the beatport plugin.
+  :bug:`3374`
+* ``beet update`` will now confirm that the user still wants to update if
+  their library folder cannot be found, preventing the user from accidentally
+  wiping out their beets database.
+  Thanks to :user:`logan-arens`.
+  :bug:`1934`
+* :doc:`/plugins/bpd`: Fix the transition to next track when in consume mode.
+  Thanks to :user:`aereaux`.
+  :bug:`3437`
 
 For plugin developers:
 
@@ -64,6 +163,26 @@ For plugin developers:
   is almost identical apart from the name change. Again, we'll re-export at the
   old location (with a deprecation warning) for backwards compatibility, but
   might stop doing this in a future release.
+* ``beets.util.command_output`` now returns a named tuple containing both the
+  standard output and the standard error data instead of just stdout alone.
+  Client code will need to access the ``stdout`` attribute on the return
+  value.
+  Thanks to :user:`zsinskri`.
+  :bug:`3329`
+* There were sporadic failures in ``test.test_player``. Hopefully these are
+  fixed. If they resurface, please reopen the relevant issue.
+  :bug:`3309` :bug:`3330`
+* The internal structure of the replaygain plugin had some changes: There are no
+  longer separate R128 backend instances. Instead the targetlevel is passed to
+  ``compute_album_gain`` and ``compute_track_gain``.
+  :bug:`3065`
+* The ``beets.plugins.MetadataSourcePlugin`` base class has been added to
+  simplify development of plugins which query album, track, and search
+  APIs to provide metadata matches for the importer. Refer to the Spotify and
+  Deezer plugins for examples of using this template class.
+  :bug:`3355`
+* The autotag hooks have been modified such that they now take 'bpm',
+  'musical_key' and a per-track based 'genre' as attributes.
 
 For packagers:
 
@@ -79,10 +198,12 @@ For packagers:
 * We attempted to fix an unreliable test, so a patch to `skip <https://sources.debian.org/src/beets/1.4.7-2/debian/patches/skip-broken-test/>`_
   or `repair <https://build.opensuse.org/package/view_file/openSUSE:Factory/beets/fix_test_command_line_option_relative_to_working_dir.diff?expand=1>`_
   the test may no longer be necessary.
+* This version drops support for Python 3.4.
 
 .. _MediaFile: https://github.com/beetbox/mediafile
 .. _Confuse: https://github.com/beetbox/confuse
 .. _works: https://musicbrainz.org/doc/Work
+.. _Deezer: https://www.deezer.com
 
 
 1.4.9 (May 30, 2019)

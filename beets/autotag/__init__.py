@@ -22,7 +22,13 @@ from beets import logging
 from beets import config
 
 # Parts of external interface.
-from .hooks import AlbumInfo, TrackInfo, AlbumMatch, TrackMatch  # noqa
+from .hooks import (  # noqa
+    AlbumInfo,
+    TrackInfo,
+    AlbumMatch,
+    TrackMatch,
+    Distance,
+)
 from .match import tag_item, tag_album, Proposal  # noqa
 from .match import Recommendation  # noqa
 
@@ -162,6 +168,10 @@ def apply_metadata(album_info, mapping):
                 'language',
                 'country',
                 'style',
+                'genre',
+                'discogs_albumid',
+                'discogs_artistid',
+                'discogs_labelid',
                 'albumstatus',
                 'albumdisambig',
                 'releasegroupdisambig',
@@ -177,6 +187,9 @@ def apply_metadata(album_info, mapping):
                 'work',
                 'mb_workid',
                 'work_disambig',
+                'bpm',
+                'initial_key',
+                'genre'
             )
         }
 

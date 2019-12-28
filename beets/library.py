@@ -449,6 +449,9 @@ class Item(LibModel):
         'albumartist_credit':   types.STRING,
         'genre':                types.STRING,
         'style':                types.STRING,
+        'discogs_albumid':      types.INTEGER,
+        'discogs_artistid':     types.INTEGER,
+        'discogs_labelid':      types.INTEGER,
         'lyricist':             types.STRING,
         'composer':             types.STRING,
         'composer_sort':        types.STRING,
@@ -932,6 +935,9 @@ class Album(LibModel):
         'album':                types.STRING,
         'genre':                types.STRING,
         'style':                types.STRING,
+        'discogs_albumid':      types.INTEGER,
+        'discogs_artistid':     types.INTEGER,
+        'discogs_labelid':      types.INTEGER,
         'year':                 types.PaddedInt(4),
         'month':                types.PaddedInt(2),
         'day':                  types.PaddedInt(2),
@@ -977,6 +983,10 @@ class Album(LibModel):
         'albumartist_credit',
         'album',
         'genre',
+        'style',
+        'discogs_albumid',
+        'discogs_artistid',
+        'discogs_labelid',
         'year',
         'month',
         'day',
@@ -1115,7 +1125,7 @@ class Album(LibModel):
         """
         item = self.items().get()
         if not item:
-            raise ValueError(u'empty album')
+            raise ValueError(u'empty album for album id %d' % self.id)
         return os.path.dirname(item.path)
 
     def _albumtotal(self):

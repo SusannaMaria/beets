@@ -35,6 +35,27 @@ like this::
 
     pip install beets[fetchart,lyrics,lastgenre]
 
+.. _metadata-source-plugin-configuration:
+
+Using Metadata Source Plugins
+-----------------------------
+
+Some plugins provide sources for metadata in addition to MusicBrainz. These
+plugins share the following configuration option:
+
+- **source_weight**: Penalty applied to matches during import. Set to 0.0 to
+  disable.
+  Default: ``0.5``.
+
+For example, to equally consider matches from Discogs and MusicBrainz add the
+following to your configuration::
+
+    plugins: discogs
+
+    discogs:
+       source_weight: 0.0
+
+
 .. toctree::
    :hidden:
 
@@ -44,9 +65,11 @@ like this::
    beatport
    bpd
    bpm
+   bpsync
    bucket
    chroma
    convert
+   deezer
    discogs
    duplicates
    edit
@@ -96,6 +119,7 @@ like this::
    the
    thumbnails
    types
+   unimported
    web
    zero
 
@@ -105,10 +129,14 @@ Autotagger Extensions
 * :doc:`chroma`: Use acoustic fingerprinting to identify audio files with
   missing or incorrect metadata.
 * :doc:`discogs`: Search for releases in the `Discogs`_ database.
+* :doc:`spotify`: Search for releases in the `Spotify`_ database.
+* :doc:`deezer`: Search for releases in the `Deezer`_ database.
 * :doc:`fromfilename`: Guess metadata for untagged tracks from their
   filenames.
 
 .. _Discogs: https://www.discogs.com/
+.. _Spotify: https://www.spotify.com
+.. _Deezer: https://www.deezer.com/
 
 Metadata
 --------
@@ -116,6 +144,7 @@ Metadata
 * :doc:`absubmit`: Analyse audio with the `streaming_extractor_music`_ program and submit the metadata to the AcousticBrainz server
 * :doc:`acousticbrainz`: Fetch various AcousticBrainz metadata
 * :doc:`bpm`: Measure tempo using keystrokes.
+* :doc:`bpsync`: Fetch updated metadata from Beatport.
 * :doc:`edit`: Edit metadata from a text editor.
 * :doc:`embedart`: Embed album art images into files' metadata.
 * :doc:`fetchart`: Fetch album cover art from various sources.
@@ -128,7 +157,7 @@ Metadata
 * :doc:`lastgenre`: Fetch genres based on Last.fm tags.
 * :doc:`lastimport`: Collect play counts from Last.fm.
 * :doc:`lyrics`: Automatically fetch song lyrics.
-* :doc:`mbsync`: Fetch updated metadata from MusicBrainz
+* :doc:`mbsync`: Fetch updated metadata from MusicBrainz.
 * :doc:`metasync`: Fetch metadata from local or remote sources
 * :doc:`mpdstats`: Connect to `MPD`_ and update the beets library with play
   statistics (last_played, play_count, skip_count, rating).
@@ -169,12 +198,15 @@ Interoperability
 * :doc:`sonosupdate`: Automatically notifies `Sonos`_ whenever the beets library
   changes.
 * :doc:`thumbnails`: Get thumbnails with the cover art on your album folders.
+* :doc:`subsonicupdate`: Automatically notifies `Subsonic`_ whenever the beets
+  library changes.
 
 
 .. _Emby: https://emby.media
 .. _Plex: https://plex.tv
 .. _Kodi: https://kodi.tv
 .. _Sonos: https://sonos.com
+.. _Subsonic: http://www.subsonic.org/
 
 Miscellaneous
 -------------
